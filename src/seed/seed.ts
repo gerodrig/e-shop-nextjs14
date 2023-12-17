@@ -1,3 +1,8 @@
+import bcryptjs from 'bcryptjs';
+
+type ValidSizes = 'XS' | 'S' | 'M' | 'L' | 'XL' | 'XXL' | 'XXXL';
+type ValidTypes = 'shirts' | 'pants' | 'hoodies' | 'hats';
+
 interface SeedProduct {
     description: string;
     images: string[];
@@ -10,19 +15,39 @@ interface SeedProduct {
     type: ValidTypes;
     gender: 'men' | 'women' | 'kid' | 'unisex';
   }
-  
-  type ValidSizes = 'XS' | 'S' | 'M' | 'L' | 'XL' | 'XXL' | 'XXXL';
-  type ValidTypes = 'shirts' | 'pants' | 'hoodies' | 'hats';
-  
+
+  interface SeedUser {
+    email: string;
+    password: string;
+    name: string;
+    role: 'admin' | 'user';
+  }
+    
+    
   interface SeedData {
+    users: SeedUser[];
     categories: string[];
     products: SeedProduct[];
   }
-  
-  
-  
+
+
   
   export const initialData: SeedData = {
+
+    users: [
+      {
+        email: 'benito@test.com',
+        name: 'Benito',
+        password: bcryptjs.hashSync('123456'),
+        role: 'admin'
+      },
+      {
+        email: 'mimi@test.com',
+        name: 'Mimi',
+        password: bcryptjs.hashSync('123456'),
+        role: 'user'
+      }
+    ],
   
     categories: [
       'Shirts', 'Pants', 'Hoodies', 'Hats'

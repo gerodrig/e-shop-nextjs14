@@ -1,7 +1,9 @@
-import type { Metadata } from 'next'
+import type { Metadata } from 'next';
 import { inter } from '@/config';
 
-import './globals.css'
+import './globals.css';
+import { HydrationOverlay } from '@builder.io/react-hydration-overlay';
+import { Providers } from '@/components';
 
 export const metadata: Metadata = {
   title: {
@@ -9,16 +11,20 @@ export const metadata: Metadata = {
     default: 'Home',
   },
   description: 'My E-shop with innovative products',
-}
+};
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        <HydrationOverlay>
+          <Providers>{children}</Providers>
+        </HydrationOverlay>
+      </body>
     </html>
-  )
+  );
 }

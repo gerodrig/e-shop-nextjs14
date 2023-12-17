@@ -6,9 +6,8 @@ export const Footer = () => {
     <div className='flex w-full justify-center text-xs mb-10'>
         <Link href='/'>
             <span className={`${ titleFont.className} antialiased font-bold`}>My E-shop</span>
-            {/* //c icon */}
-            <span className='ml-2'>&copy; {new Date().getFullYear()}</span>
         </Link>
+            <span className='ml-2'>&copy; {new Date().getFullYear()}</span>
 
         <Link href='/'>
             <span className='ml-2'>Privacy Policy</span>

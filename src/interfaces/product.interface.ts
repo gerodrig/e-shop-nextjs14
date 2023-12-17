@@ -1,3 +1,12 @@
+export type Size = 'XS'|'S'|'M'|'L'|'XL'|'XXL'|'XXXL';
+export type Type = 'shirts'|'pants'|'hoodies'|'hats';
+export type Gender = 'men'|'women'|'kid'|'unisex'
+
+export interface Category {
+    id: string;
+    name: Type; 
+}
+
 export interface Product {
     id: string;
     description: string;
@@ -22,6 +31,9 @@ export interface CartProduct {
     image: string;
 }
 
-export type Size = 'XS'|'S'|'M'|'L'|'XL'|'XXL'|'XXXL';
-export type Type = 'shirts'|'pants'|'hoodies'|'hats';
-export type Gender = 'men'|'women'|'kid'|'unisex'
+export interface ProductImage {
+    id: number;
+    url: string;
+    productId?: string;
+}
+

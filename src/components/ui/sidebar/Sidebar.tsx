@@ -1,4 +1,6 @@
 'use client';
+
+import { useSession } from 'next-auth/react';
 import {
   IoCloseOutline,
   IoLogInOutline,
@@ -9,13 +11,23 @@ import {
   IoShirtOutline,
   IoTicketOutline,
 } from 'react-icons/io5';
+
 import clsx from 'clsx';
 import { SidebarItem } from './SidebarItem';
+import { AuthButton } from './AuthButton';
 import { useUIStore } from '@/store';
+// import { Loader } from '../animations/Loader';
 
 export const Sidebar = () => {
   const isSideMenuOpen = useUIStore((state) => state.isSideMenuOpen);
   const closeMenu = useUIStore((state) => state.closeSideMenu);
+
+  const { data: session } = useSession();
+  const isAuthenticated = !!session?.user;
+
+  const { user } = session ?? { user: null };
+  const isAdmin = user?.role === 'admin';
+
 
   return (
     <div>
@@ -26,7 +38,10 @@ export const Sidebar = () => {
 
       {/* blur */}
       {isSideMenuOpen && (
-        <div onClick={closeMenu} className="fade-in fixed top-0 left-0 w-screen h-screen z-10 backdrop-filter backdrop-blur-sm" />
+        <div
+          onClick={closeMenu}
+          className="fade-in fixed top-0 left-0 w-screen h-screen z-10 backdrop-filter backdrop-blur-sm"
+        />
       )}
 
       {/* // Sidemenu */}
@@ -34,15 +49,20 @@ export const Sidebar = () => {
         className={clsx(
           'fixed p-5 right-0 top-0 w-[500px] h-screen bg-white z-20 shadow-2xl transform transition-all duration-300',
           {
-            "translate-x-full": !isSideMenuOpen,
-          },
+            'translate-x-full': !isSideMenuOpen,
+          }
         )}
       >
-        <IoCloseOutline
-          size={50}
-          className="absolute top-5 right-5 cursor-pointer"
-          onClick={closeMenu}
-        />
+        <div>
+          {isAuthenticated && user && (
+            <p className="font-bold">Hello, {user?.name}</p>
+          )}
+          <IoCloseOutline
+            size={50}
+            className="absolute top-5 right-5 cursor-pointer"
+            onClick={closeMenu}
+          />
+        </div>
 
         {/* Input */}
         <div className="relative mt-14">
@@ -55,18 +75,50 @@ export const Sidebar = () => {
         </div>
 
         {/* Menu */}
+        {isAuthenticated && (
+          <>
+            <SidebarItem
+              Icon={IoPersonOutline}
+              name="Profile"
+              href="/profile"
+              onClick={closeMenu}
+            />
+            <SidebarItem
+              Icon={IoTicketOutline}
+              name="Orders"
+              href="/orders"
+              onClick={closeMenu}
+            />
+          </>
+        )}
 
-        <SidebarItem Icon={IoPersonOutline} name="Profile" href="/" />
-        <SidebarItem Icon={IoTicketOutline} name="Orders" href="/" />
-        <SidebarItem Icon={IoLogInOutline} name="Sign In" href="/" />
-        <SidebarItem Icon={IoLogOutOutline} name="Log Out" href="/" />
+        {!isAuthenticated && (
+          <SidebarItem
+            Icon={IoLogInOutline}
+            name="Sign In"
+            href="/auth/login"
+            onClick={closeMenu}
+          />
+        )}
 
-        {/* Line Separator */}
-        <div className="w-full h-px bg-gray-200 my-10" />
+        {isAuthenticated && (
+          <AuthButton
+            Icon={IoLogOutOutline}
+            action="logout"
+            onClick={closeMenu}
+            redirectTo="/"
+          />
+        )}
 
-        <SidebarItem Icon={IoShirtOutline} name="Products" href="/" />
-        <SidebarItem Icon={IoTicketOutline} name="Orders" href="/" />
-        <SidebarItem Icon={IoPeopleOutline} name="Users" href="/" />
+        {isAuthenticated && isAdmin && (
+          <>
+            {/* Line Separator */}
+            <div className="w-full h-px bg-gray-200 my-10" />
+            <SidebarItem onClick={closeMenu} Icon={IoShirtOutline} name="Products" href="/admin/products" />
+            <SidebarItem onClick={closeMenu} Icon={IoTicketOutline} name="Orders" href="/admin/orders" />
+            <SidebarItem onClick={closeMenu} Icon={IoPeopleOutline} name="Users" href="/admin/users" />
+          </>
+        )}
       </nav>
     </div>
   );

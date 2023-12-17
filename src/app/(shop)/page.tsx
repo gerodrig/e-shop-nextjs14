@@ -3,9 +3,8 @@ export const revalidate = 60;
 
 import { redirect } from 'next/navigation';
 
-import { Pagination, Title } from '@/components';
-import { ProductGrid } from '@/components';
-import { getPaginatedProductsWithImages } from '../../actions/product/product-pagination';
+import { getPaginatedProductsWithImages } from '@/actions';
+import { Pagination, Title, ProductGrid } from '@/components';
 
 //get Search Params
 interface Props {

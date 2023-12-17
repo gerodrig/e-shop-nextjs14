@@ -1,8 +1,12 @@
-import Link from 'next/link';
+// import { initialData } from '@/seed/seed';
 
-import { initialData } from '@/seed/seed';
-
-import { Title, CartItem, PaymentStatus } from '@/components';
+import { redirect } from 'next/navigation';
+import { getOrderById } from '@/actions';
+import { Title, PaymentStatus } from '@/components';
+import { ProductsInOrder } from './ui/ProductsInOrder';
+import { DeliveryAddress } from './ui/DeliveryAddress';
+import { OrderSummary } from './ui/OrderSummary';
+import { PayPalButton } from '@/components/paypal/PayPalButton';
 
 interface Props {
   params: {
@@ -10,68 +14,50 @@ interface Props {
   };
 }
 
-const productsInCart = [
-  initialData.products[0],
-  initialData.products[1],
-  initialData.products[2],
-];
-
-export default function CheckoutPage({ params }: Props) {
+export default async function OrdersById({ params }: Props) {
   const { id } = params;
 
+  //TODO: Call server action to get order by id
+  const { address, productsInOrder, orderSummary, ok, isOrderPaid } =
+    await getOrderById(id);
+
   //TODO: Verify
+  if (!ok) {
+    redirect('/');
+  }
   //redirect() if no id
 
   return (
     <div className="flex justify-center items-center mb-72 px-10 sm:px-0">
       <div className="flex flex-col w-[1000px]">
-        <Title title={`Order #${id}`} />
+        <Title title={`Order #${id.split('-').at(-1)}`} />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
           {/* Cart */}
           <div className="flex flex-col mt-5">
             {/* Payment Status */}
-            <PaymentStatus isPaid={true} />
+            <PaymentStatus isPaid={isOrderPaid!} />
 
-            {/* Items in local storage */}
-            {productsInCart.map((product) => {
-              const newProduct = { ...product, id: `${id}` };
-              return (
-                <CartItem key={product.slug} product={newProduct} edit={false} />
-              );
-            })}
+            {productsInOrder && (
+              <ProductsInOrder productsInOrder={productsInOrder} />
+            )}
           </div>
           {/* Checkout */}
           <div className="bg-white rounded-xl shadow-xl p-7">
             <h2 className="text-2xl mb-2">Delivery Address</h2>
-            <div className="mb-10">
-              <p className="text-xl">Benito Martinez</p>
-              <p>123 Main Street</p>
-              <p>Montreal, QC</p>
-              <p>H3Z 2Y7</p>
-              <p>Canada</p>
-              <p>514-123-4567</p>
-            </div>
+            {address && <DeliveryAddress {...address} />}
 
             {/* Divider */}
             <div className="w-full h-0.5 rounded bg-gray-200 mb-10" />
 
             <h2 className="text-2xl mb-2">Order Summary</h2>
-            <div className="grid grid-cols-2">
-              <span>Number of Products</span>
-              <span className="text-right">3 Items</span>
 
-              <span>Subtotal</span>
-              <span className="text-right">$ 100</span>
-
-              <span>GST (5%)</span>
-              <span className="text-right">$ 100</span>
-
-              <span className="mt-5 text-2xl">Total:</span>
-              <span className="mt-5 text-2xl text-right">$ 100</span>
-            </div>
-
+            {orderSummary && <OrderSummary {...orderSummary} />}
             <div className="mt-5 mb-2 w-full">
-              <PaymentStatus isPaid={true} />=
+              {isOrderPaid ? (
+                <PaymentStatus isPaid={isOrderPaid!} />
+              ) : (
+                <PayPalButton orderId={id} amount={orderSummary?.total!} />
+              )}
             </div>
           </div>
         </div>
